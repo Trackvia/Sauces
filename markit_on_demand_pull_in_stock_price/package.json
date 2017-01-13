@@ -1,5 +1,5 @@
 {
-  "name": "report-line-items",
+  "name": "markit_on_demand_pull_in_stock_price",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
