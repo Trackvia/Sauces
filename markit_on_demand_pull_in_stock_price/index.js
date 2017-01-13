@@ -8,7 +8,7 @@ const TICKER_SYMBOL_FIELD = 'Ticker Symbol';
 const PRICE_FIELD = 'Price';
 const VIEW_ID = '3';
 
-var api = new TrackviaAPI(API_KEY, 'https://blackhawk.ci.xvia.com');
+var api = new TrackviaAPI(API_KEY, 'https://go.trackvia.com');
 
 exports.handler = function(event, context, callback) {
     console.log('--------------   Start   --------------');
