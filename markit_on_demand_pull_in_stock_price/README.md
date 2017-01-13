@@ -1,4 +1,4 @@
-# Markit On Demand
+# Markit On Demand - Pull in stock price
 
 This sauce will pull the current price of a stock symbol found in a field in a TrackVia record using the [markit on demand api](http://dev.markitondemand.com/MODApis/) and put it back into record in a field of your choosing.
 
