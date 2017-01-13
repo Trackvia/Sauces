@@ -6,7 +6,7 @@ As you can imagine, this lead to all sorts of witty puns. As the project evolved
 
 ## Getting Started
 
-Please feel free to use and modify the code here to meet your needs. All code within this project is contributed from various sources and is provided as is with no warranty, so use at your own risk.
+Please feel free to use and modify the code here to meet your needs. All code within this project is contributed from various sources and is provided as is with no warranty, so use at your own risk. For more information see our [license](https://github.com/Trackvia/Sauces/blob/master/LICENSE.md).
 
 ## Contributing
 
