@@ -8,5 +8,5 @@ You'll need to update the following constants:
 const API_KEY = '12345';
 const USERNAME = 'demo@trackvia.com';
 const PASSWORD = 'Test1234';
-const VIEW_ID = '3';
+const VIEW_ID=1111;
 ```
