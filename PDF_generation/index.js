@@ -18,34 +18,34 @@ var globalCallback = null;
  * information on the Handlebars template language
  * see http://handlebarsjs.com/
  **********************************************/
-//The API key that gives you access to the API
-//This is found at https://go.trackvia.com/#/my-info
+// The API key that gives you access to the API
+// This is found at https://go.trackvia.com/#/my-info
 const API_KEY = '123456789';
 
-//The name of the user to login as
+// The name of the user to login as
 const USERNAME = 'api.user@trackvia.com';
 
-//The password of the user to login as
+// The password of the user to login as
 const PASSWORD = 'correcthorsebatterystaple';
 
-//The address of the server you'll be using
+// The address of the server you'll be using
 const PRODUCTION_SERVER = 'https://go.trackvia.com';
 
-//Name of the PDF we're going to create. This could
-//be pulled from a field in the record or generated
-//using a time stamp or other derived data
+// Name of the PDF we're going to create. This could
+// be pulled from a field in the record or generated
+// using a time stamp or other derived data
 const PDF_FILE_NAME = "test.pdf";
 
-//The numeric ID of the view to pull the data from
-//You can find this in the URL of your view
+// The numeric ID of the view to pull the data from
+// You can find this in the URL of your view
 // https://go.trackvia.com/#/apps/1/tables/2/views/3
 const VIEW_ID = 3;
 
-//The name of the field that is used to determine if a PDF
-//should be created
+// The name of the field that is used to determine if a PDF
+// should be created
 const CREATE_PDF_CHECKBOX_FIELD_NAME = 'Create PDF';
 
-//The name of the field were the PDF file should be uploaded
+// The name of the field were the PDF file should be uploaded
 const PDF_FILE_FIELD_NAME = 'PDF';
 
 /*********************************************
@@ -60,7 +60,7 @@ const PDF_FILE_FIELD_NAME = 'PDF';
 
 
 
-//The TrackVia api for interaction with the data
+// The TrackVia api for interaction with the data
 var api = new TrackviaAPI(API_KEY, PRODUCTION_SERVER);
 
 /**
@@ -71,11 +71,11 @@ exports.handler = function(event, context, callback) {
     console.log('---  starting  ---');
     globalCallback = callback;
     console.log(event);
-    //make sure we have a record ID
-    //Note, this will only be populated when an individual record
-    //is edited/created. For bulk edit scenarios it's recommend
-    //to use a filtered view that shows all records that need
-    //a PDF created
+    // make sure we have a record ID
+    // Note, this will only be populated when an individual record
+    // is edited/created. For bulk edit scenarios it's recommend
+    // to use a filtered view that shows all records that need
+    // a PDF created
     if (!event.recordId && !event.recordIds) {
             console.log('---  No record ID. I am out  ---');
     } else {
@@ -91,30 +91,30 @@ exports.handler = function(event, context, callback) {
  */
 function step1GetData(api, recordId){
 
-    //first we need to login
+    // first we need to login
     api.login(USERNAME, PASSWORD)
     .then(() => {
             console.log('Logged In.');
-            //now get a record
+            // now get a record
             return api.getRecord(VIEW_ID, recordId);
         })
     .then((record) => {
         console.log("I got the record");
-        //got a response..
+        // got a response..
         console.log(record);
-        //get the data
+        // get the data
         var datas = record.data;
-        //create a map of field names to values
-        //be sure to strip out spaces from the field names
-        //so it'll work with the template format
+        // create a map of field names to values
+        // be sure to strip out spaces from the field names
+        // so it'll work with the template format
         dataMap = {};
-        for(key in datas){
+        for(var key in datas){
             dataMap[key.replace(/\s/g, '')] = datas[key];
         }
         console.log("I created a data map");
         console.log(dataMap);
 
-        //check if the CreatePDF checkbox is checked
+        // check if the CreatePDF checkbox is checked
         if(!datas[CREATE_PDF_CHECKBOX_FIELD_NAME] || datas[CREATE_PDF_CHECKBOX_FIELD_NAME].length == 0){
             console.log("There's nothing to do since the checkbox isn't checked")
             if(globalCallback) {
@@ -123,7 +123,7 @@ function step1GetData(api, recordId){
             return;
         }
 
-        //no go make a PDF
+        // now go make a PDF
         step2CreatePdf(api, recordId, dataMap);
         
     })
@@ -142,22 +142,22 @@ function step1GetData(api, recordId){
  */
 function step2CreatePdf(api, recordId, dataMap){
     console.log("step 2");
-    //now get the template file
+    // now get the template file
     fs.readFile('./templates/template.hbs', 'utf-8', function(err, hbsFile) {
-        //if there's an error log it.
+        // if there's an error log it.
         if (err) { 
             console.log(err);
             globalCallback(err, null);
             return;
         }
-        //no error so compile the template
+        // no error so compile the template
         var template = Handlebars.compile(hbsFile);
         var html = template(dataMap);
-        //print out the HTML just to be sure
+        // print out the HTML just to be sure
         console.log("Created this HTML from the template");
         console.log(html);
         
-        //setup some options so the PDF is lovely
+        // setup some options so the PDF is lovely
         var options = {
             format: 'Letter',
             base: 'file://' + __dirname + '/',
@@ -169,9 +169,9 @@ function step2CreatePdf(api, recordId, dataMap){
             }
         };
 
-        //create the PDF
+        // create the PDF
         pdf.create(html, options).toFile('/tmp/' + PDF_FILE_NAME, function(err, res) {
-            //if something went wrong tell us and leave
+            // if something went wrong tell us and leave
             if (err) {
                 console.log('ERROR: ' + err);
                 if(globalCallback){
@@ -180,7 +180,7 @@ function step2CreatePdf(api, recordId, dataMap){
                 return;
             }
 
-            //nothing went wrong so onward and upward
+            // nothing went wrong so onward and upward
             step3SavePDF(api, recordId, res.filename);
         });
     });
@@ -197,24 +197,24 @@ function step2CreatePdf(api, recordId, dataMap){
 function step3SavePDF(api, recordId, fileName){
     console.log("step 3");
 
-    //upload the file to the API
+    // upload the file to the API
     api.attachFile(VIEW_ID, recordId, PDF_FILE_FIELD_NAME, fileName)
     .then(function(result) {
         console.log('file added');
 
-        //ok now get the identifier of the file that we added and 
-        //associate it with the record.
+        // ok now get the identifier of the file that we added and 
+        // associate it with the record.
         var fileIdentifier = result.identifier;
         
-        //edit the record to set the pdf checkbox back to empty
+        // edit the record to set the pdf checkbox back to empty
         resetPDFCheckBox = {};
         resetPDFCheckBox[CREATE_PDF_CHECKBOX_FIELD_NAME] = [];
 
-        //edit the record
+        // edit the record
         return api.updateRecord(VIEW_ID, recordId, resetPDFCheckBox);
     })
     .then(function(result) {
-        //and we did it!!
+        // and we did it!!
         console.log("all done");
         globalCallback(null, 'success');
         return;
